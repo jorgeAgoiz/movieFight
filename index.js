@@ -12,17 +12,10 @@ const fetchData = async (searchMovie) => {
 
 const movie1 = document.querySelector('#movie1');//Select input element in HTML
 
-let timeOutId;
-const onInput = event => {
-    if(timeOutId){//If variable timeOudId its defined, the condition its true
-        clearTimeout(timeOutId);//Cancel the call to the API
-    }
-
-    timeOutId = setTimeout(() => {
-        fetchData(event.target.value);//Call when the user doesnt press keys in 1,5 seconds
-    }, 1500);
+const onInput = event => {//Call to api with fetchData function
+        fetchData(event.target.value);
 };
 
-movie1.addEventListener('input', onInput);//Event listener with onInput function
+movie1.addEventListener('input', debounce(onInput, 1000));//Event listener with onInput function
 
 
