@@ -15,25 +15,43 @@ const fetchData = async (searchMovie) => {
     return response.data.Search;
 };
 
-const movie1 = document.querySelector('#movie1');//Select input element in HTML
+const root = document.querySelector('.autocomplete');//Create all HTML elements inside the original div
+root.innerHTML = `
+    <label><b>Search For a Movie</b></label>
+    <input class="input" />
+    <div class="dropdown">
+        <div class="dropdown-menu">
+            <div class="dropdown-content results"></div>
+        </div>
+    </div>
+`;
+
+const input = document.querySelector('.input');//Select input element in HTML
+const dropdown = document.querySelector('.dropdown');//Select the menu div element
+const resultsWrapper = document.querySelector('.results');//Select the results div element
 
 const onInput = async event => {//Call to api with fetchData function
-       const movies = await fetchData(event.target.value);
-       console.log(movies);
+    const movies = await fetchData(event.target.value);
+    console.log(movies);
 
-       for (let movie of movies){
-           const divM = document.createElement('div');//Create an element div
-           divM.innerHTML = `
-                <img src="${movie.Poster}"/>
-                <h1>${movie.Title}<h1/>
-           `;//Insert HTML inside the div element
-           document.body.appendChild(divM);//And add to the body
-       }
+    resultsWrapper.innerHTML = ``;
+    dropdown.classList.add('is-active');//When the call was finished add this class to the menu
+    for (let movie of movies){
+        const option = document.createElement('a');//Create an element <a>
+        option.classList.add('dropdown-item');//Add this class each element
+        const imgSrc = movie.Poster === 'N/A' ? '' : movie.Poster;
+
+        option.innerHTML = `
+            <img src="${imgSrc}"/>
+            ${movie.Title}
+        `;//Insert HTML inside the <a> element
+        resultsWrapper.appendChild(option);//And add to the a
+    }
        
 
        
 };
 
-movie1.addEventListener('input', debounce(onInput, 1000));//Event listener with onInput function and delay
+input.addEventListener('input', debounce(onInput, 1500));//Event listener with onInput function and delay
 
 
