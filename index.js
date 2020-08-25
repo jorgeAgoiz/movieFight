@@ -41,6 +41,7 @@ const onInput = async event => {//Call to api with fetchData function
 
     resultsWrapper.innerHTML = ``;
     dropdown.classList.add('is-active');//When the call was finished add this class to the menu
+    
     for (let movie of movies){
         const option = document.createElement('a');//Create an element <a>
         option.classList.add('dropdown-item');//Add this class each element
