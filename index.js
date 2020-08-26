@@ -1,79 +1,33 @@
-//API movies call with axios library
-const fetchData = async (searchMovie) => {
-    //Create async function with axios call to the API
-    const response = await axios.get('http://www.omdbapi.com/',{
-        params: {//Axios library allows to pass objects as arguments
-            apikey: '6092f0f8',
-            s: searchMovie
-        }
-    });
-    if (response.data.Error){
-        return [];//If Error its true return an empty array to fix the error can not iterate.
-    }
+// createAutocomplete object with all methods inside
 
-    console.log(response.data);//Just for check in the console the results
-    return response.data.Search;
-};
-
-const root = document.querySelector('.autocomplete');//Create all HTML elements inside the original div
-root.innerHTML = `
-    <label><b>Search For a Movie</b></label>
-    <input class="input" />
-    <div class="dropdown">
-        <div class="dropdown-menu">
-            <div class="dropdown-content results"></div>
-        </div>
-    </div>
-`;
-
-const input = document.querySelector('.input');//Select input element in HTML
-const dropdown = document.querySelector('.dropdown');//Select the menu div element
-const resultsWrapper = document.querySelector('.results');//Select the results div element
-
-const onInput = async event => {//Call to api with fetchData function
-    const movies = await fetchData(event.target.value);
-
-    // If const movies is empty(delete the title from the input) remove the dropdown.
-    if(!movies.length){
-        dropdown.classList.remove('is-active');
-        return;
-    }
-
-    resultsWrapper.innerHTML = ``;
-    dropdown.classList.add('is-active');//When the call was finished add this class to the menu
-    
-    for (let movie of movies){
-        const option = document.createElement('a');//Create an element <a>
-        option.classList.add('dropdown-item');//Add this class each element
+createAutoComplete({
+    root: document.querySelector('.autocomplete'),
+    renderOption(movie) {
         const imgSrc = movie.Poster === 'N/A' ? '' : movie.Poster;
-
-        option.innerHTML = `
+        return `
             <img src="${imgSrc}"/>
-            ${movie.Title}
-        `;//Insert HTML inside the <a> element
-
-        option.addEventListener('click', () => {//if you click in a movie, close again the dropdown and 
-            dropdown.classList.remove('is-active');// put the value in the input form of this movie
-            input.value = movie.Title;
-
-            //Now we need to do another request for the movie data
-            onSelectMovie(movie);
+            ${movie.Title} (${movie.Year})
+        `;
+    },
+    inputValue(movie){
+        return movie.Title;
+    },
+    onOptionSelect(movie) {
+        onSelectMovie(movie);
+    },
+    async fetchData(searchTerms) {//API movies call with axios library
+        //Create async function with axios call to the API
+        const response = await axios.get('http://www.omdbapi.com/',{
+            params: {//Axios library allows to pass objects as arguments
+                apikey: '6092f0f8',
+                s: searchTerms
+            }
         });
-
-        resultsWrapper.appendChild(option);//And add to the a
+        if (response.data.Error){
+            return [];//If Error its true return an empty array to fix the error can not iterate.
+        }
+        return response.data.Search;
     }
-       
-
-       
-};
-
-input.addEventListener('input', debounce(onInput, 1500));//Event listener with onInput function and delay
-
-document.addEventListener('click', event => {// If you click outside the input, this event will does not 
-    if(!root.contains(event.target)){ // show the list of movies.
-        dropdown.classList.remove('is-active');
-    }
-    console.log(event.target);
 });
 
 // This function make a new request to show the data of movie selected
