@@ -1,7 +1,5 @@
-// createAutocomplete object with all methods inside
-
-createAutoComplete({
-    root: document.querySelector('.autocomplete'),
+//The original object with all methods, ready to copy for another elements
+const autoCompleteConfig = {
     renderOption(movie) {
         const imgSrc = movie.Poster === 'N/A' ? '' : movie.Poster;
         return `
@@ -11,9 +9,6 @@ createAutoComplete({
     },
     inputValue(movie){
         return movie.Title;
-    },
-    onOptionSelect(movie) {
-        onSelectMovie(movie);
     },
     async fetchData(searchTerms) {//API movies call with axios library
         //Create async function with axios call to the API
@@ -28,23 +23,39 @@ createAutoComplete({
         }
         return response.data.Search;
     }
+};
+
+// createAutocomplete objects with all autoCompleteConfig methods inside
+createAutoComplete({//Left movie object
+    ...autoCompleteConfig,
+    root: document.querySelector('#left-autocomplete'),
+    onOptionSelect(movie) {
+        document.querySelector('.tutorial').classList.add('is-hidden');
+        onSelectMovie(movie, document.querySelector('#left-summary'));
+    }   
+});
+createAutoComplete({//Right movie object
+    ...autoCompleteConfig,
+    root: document.querySelector('#right-autocomplete'),
+    onOptionSelect(movie) {
+        document.querySelector('.tutorial').classList.add('is-hidden');
+        onSelectMovie(movie, document.querySelector('#right-summary'));
+    },   
 });
 
 // This function make a new request to show the data of movie selected
-const onSelectMovie = async movie => {
-
+const onSelectMovie = async (movie, summaryElement) => {
+// Also pass the element where we want to show the movie (summaryElement)
     const response = await axios.get('http://www.omdbapi.com/',{
         params: {//Axios library allows to pass objects as arguments
             apikey: '6092f0f8',
             i: movie.imdbID
         }
     });
-
-    console.log(response.data);
-
-    document.querySelector('.summary').innerHTML = movieTemplate(response.data);
+    summaryElement.innerHTML = movieTemplate(response.data);
 };
 
+//This is the template for the movie results
 const movieTemplate = movieDetail => {
     return `
         <article class="media">
