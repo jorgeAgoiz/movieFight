@@ -14,7 +14,7 @@ const autoCompleteConfig = {
         //Create async function with axios call to the API
         const response = await axios.get('http://www.omdbapi.com/',{
             params: {//Axios library allows to pass objects as arguments
-                apikey: '6092f0f8',
+                apikey: 'YOURAPIKEY',//Introduce your api key.
                 s: searchTerms
             }
         });
